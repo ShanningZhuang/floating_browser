@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <title>Floating Browser</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f5f5;
+      height: 50px;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      height: 50px;
+      padding: 8px 12px;
+      background: linear-gradient(to bottom, #fafafa, #e8e8e8);
+      border-bottom: 1px solid #ccc;
+      -webkit-app-region: drag;
+      gap: 8px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 4px;
+      -webkit-app-region: no-drag;
+    }
+
+    .nav-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      background: linear-gradient(to bottom, #fff, #e8e8e8);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #333;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: linear-gradient(to bottom, #fff, #ddd);
+      border-color: #999;
+    }
+
+    .nav-btn:active:not(:disabled) {
+      background: linear-gradient(to bottom, #ddd, #ccc);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .url-container {
+      flex: 1;
+      display: flex;
+      -webkit-app-region: no-drag;
+    }
+
+    .url-input {
+      flex: 1;
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 13px;
+      background: #fff;
+      outline: none;
+    }
+
+    .url-input:focus {
+      border-color: #4a90d9;
+      box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.2);
+    }
+
+    .pin-btn {
+      width: 32px;
+      height: 28px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      background: linear-gradient(to bottom, #fff, #e8e8e8);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s ease;
+      -webkit-app-region: no-drag;
+    }
+
+    .pin-btn:hover {
+      background: linear-gradient(to bottom, #fff, #ddd);
+      border-color: #999;
+    }
+
+    .pin-btn.active {
+      background: linear-gradient(to bottom, #4a90d9, #3a7bc8);
+      border-color: #2a6bb8;
+      color: #fff;
+    }
+
+    .pin-btn.active:hover {
+      background: linear-gradient(to bottom, #5a9fe9, #4a8bd8);
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="nav-buttons">
+      <button class="nav-btn" id="backBtn" title="Back" disabled>&#8592;</button>
+      <button class="nav-btn" id="forwardBtn" title="Forward" disabled>&#8594;</button>
+      <button class="nav-btn" id="reloadBtn" title="Reload">&#8635;</button>
+    </div>
+    <div class="url-container">
+      <input type="text" class="url-input" id="urlInput" placeholder="Enter URL...">
+    </div>
+    <button class="pin-btn" id="pinBtn" title="Toggle Always on Top (Cmd+Shift+T)">&#128204;</button>
+  </div>
+
+  <script>
+    const backBtn = document.getElementById('backBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+    const urlInput = document.getElementById('urlInput');
+    const pinBtn = document.getElementById('pinBtn');
+
+    // Navigation
+    backBtn.addEventListener('click', () => window.electronAPI.goBack());
+    forwardBtn.addEventListener('click', () => window.electronAPI.goForward());
+    reloadBtn.addEventListener('click', () => window.electronAPI.reload());
+
+    // URL input
+    urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const url = urlInput.value.trim();
+        if (url) {
+          window.electronAPI.navigate(url);
+        }
+      }
+    });
+
+    // Select all on focus
+    urlInput.addEventListener('focus', () => {
+      urlInput.select();
+    });
+
+    // Pin button
+    pinBtn.addEventListener('click', () => {
+      window.electronAPI.toggleAlwaysOnTop();
+    });
+
+    // Event listeners from main process
+    window.electronAPI.onInitState((state) => {
+      urlInput.value = state.url;
+      pinBtn.classList.toggle('active', state.alwaysOnTop);
+    });
+
+    window.electronAPI.onUrlChanged((url) => {
+      urlInput.value = url;
+    });
+
+    window.electronAPI.onAlwaysOnTopChanged((value) => {
+      pinBtn.classList.toggle('active', value);
+    });
+
+    window.electronAPI.onNavigationState((state) => {
+      backBtn.disabled = !state.canGoBack;
+      forwardBtn.disabled = !state.canGoForward;
+    });
+  </script>
+</body>
+</html>
