@@ -23,9 +23,11 @@
   "build": {
     "appId": "com.floating-browser.app",
     "productName": "Floating Browser",
+    "icon": "icon.jpeg",
     "mac": {
       "category": "public.app-category.utilities",
-      "target": ["dmg", "zip"]
+      "target": ["dmg", "zip"],
+      "icon": "icon.jpeg"
     },
     "files": [
       "dist/**/*",
