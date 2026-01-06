@@ -27,7 +27,7 @@ let browserView: BrowserView | null = null;
 let isPinned: boolean = true;
 
 const TOOLBAR_HEIGHT_NORMAL = 50;
-const TOOLBAR_HEIGHT_PINNED = 28;
+const TOOLBAR_HEIGHT_PINNED = 40;
 
 function getToolbarHeight(): number {
   return isPinned ? TOOLBAR_HEIGHT_PINNED : TOOLBAR_HEIGHT_NORMAL;
@@ -43,8 +43,8 @@ function createWindow() {
     y: bounds.y,
     width: bounds.width,
     height: bounds.height,
-    minWidth: 300,
-    minHeight: 400,
+    minWidth: 100,
+    minHeight: 100,
     frame: false,
     alwaysOnTop: alwaysOnTop,
     webPreferences: {

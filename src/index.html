@@ -117,12 +117,14 @@
       background: linear-gradient(to bottom, #5a9fe9, #4a8bd8);
     }
 
-    /* Pinned state - minimal toolbar */
+    /* Pinned state - compact toolbar with drag area */
     .toolbar.pinned {
-      height: 28px;
-      padding: 4px 8px;
-      background: transparent;
-      border-bottom: none;
+      height: 40px;
+      padding: 8px;
+      justify-content: flex-end;
+      background: rgba(245, 245, 245, 0.9);
+      border-bottom: 1px solid #ddd;
+      -webkit-app-region: drag;
     }
 
     .toolbar.pinned .nav-buttons,
@@ -131,29 +133,19 @@
     }
 
     .toolbar.pinned .pin-btn {
-      opacity: 0.3;
-      background: transparent;
-      border: none;
+      background: linear-gradient(to bottom, #4a90d9, #3a7bc8);
+      border: 1px solid #2a6bb8;
       width: 24px;
-      height: 20px;
+      height: 24px;
       font-size: 12px;
+      border-radius: 4px;
+      color: #fff;
     }
 
     .toolbar.pinned .pin-btn:hover {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 4px;
+      background: linear-gradient(to bottom, #5a9fe9, #4a8bd8);
     }
 
-    .toolbar.pinned .pin-btn.active {
-      background: transparent;
-      color: #666;
-    }
-
-    .toolbar.pinned .pin-btn.active:hover {
-      background: rgba(255, 255, 255, 0.8);
-      color: #333;
-    }
   </style>
 </head>
 <body>
