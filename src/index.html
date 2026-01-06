@@ -116,6 +116,44 @@
     .pin-btn.active:hover {
       background: linear-gradient(to bottom, #5a9fe9, #4a8bd8);
     }
+
+    /* Pinned state - minimal toolbar */
+    .toolbar.pinned {
+      height: 28px;
+      padding: 4px 8px;
+      background: transparent;
+      border-bottom: none;
+    }
+
+    .toolbar.pinned .nav-buttons,
+    .toolbar.pinned .url-container {
+      display: none;
+    }
+
+    .toolbar.pinned .pin-btn {
+      opacity: 0.3;
+      background: transparent;
+      border: none;
+      width: 24px;
+      height: 20px;
+      font-size: 12px;
+    }
+
+    .toolbar.pinned .pin-btn:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 4px;
+    }
+
+    .toolbar.pinned .pin-btn.active {
+      background: transparent;
+      color: #666;
+    }
+
+    .toolbar.pinned .pin-btn.active:hover {
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -132,6 +170,7 @@
   </div>
 
   <script>
+    const toolbar = document.querySelector('.toolbar');
     const backBtn = document.getElementById('backBtn');
     const forwardBtn = document.getElementById('forwardBtn');
     const reloadBtn = document.getElementById('reloadBtn');
@@ -167,6 +206,7 @@
     window.electronAPI.onInitState((state) => {
       urlInput.value = state.url;
       pinBtn.classList.toggle('active', state.alwaysOnTop);
+      toolbar.classList.toggle('pinned', state.alwaysOnTop);
     });
 
     window.electronAPI.onUrlChanged((url) => {
@@ -175,6 +215,7 @@
 
     window.electronAPI.onAlwaysOnTopChanged((value) => {
       pinBtn.classList.toggle('active', value);
+      toolbar.classList.toggle('pinned', value);
     });
 
     window.electronAPI.onNavigationState((state) => {

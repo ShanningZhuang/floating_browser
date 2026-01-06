@@ -24,12 +24,19 @@ const store = new Store<StoreSchema>({
 
 let mainWindow: BrowserWindow | null = null;
 let browserView: BrowserView | null = null;
+let isPinned: boolean = true;
 
-const TOOLBAR_HEIGHT = 50;
+const TOOLBAR_HEIGHT_NORMAL = 50;
+const TOOLBAR_HEIGHT_PINNED = 28;
+
+function getToolbarHeight(): number {
+  return isPinned ? TOOLBAR_HEIGHT_PINNED : TOOLBAR_HEIGHT_NORMAL;
+}
 
 function createWindow() {
   const bounds = store.get("windowBounds");
   const alwaysOnTop = store.get("alwaysOnTop");
+  isPinned = alwaysOnTop;
 
   mainWindow = new BrowserWindow({
     x: bounds.x,
@@ -38,7 +45,7 @@ function createWindow() {
     height: bounds.height,
     minWidth: 300,
     minHeight: 400,
-    titleBarStyle: "default",
+    frame: false,
     alwaysOnTop: alwaysOnTop,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -112,12 +119,13 @@ function createWindow() {
 function updateBrowserViewBounds() {
   if (!mainWindow || !browserView) return;
 
+  const toolbarHeight = getToolbarHeight();
   const [width, height] = mainWindow.getContentSize();
   browserView.setBounds({
     x: 0,
-    y: TOOLBAR_HEIGHT,
+    y: toolbarHeight,
     width: width,
-    height: height - TOOLBAR_HEIGHT,
+    height: height - toolbarHeight,
   });
 }
 
@@ -168,9 +176,11 @@ ipcMain.on("toggle-always-on-top", () => {
   if (!mainWindow) return;
   const current = mainWindow.isAlwaysOnTop();
   const newValue = !current;
+  isPinned = newValue;
   mainWindow.setAlwaysOnTop(newValue);
   store.set("alwaysOnTop", newValue);
   mainWindow.webContents.send("always-on-top-changed", newValue);
+  updateBrowserViewBounds();
 });
 
 // App lifecycle
@@ -182,9 +192,11 @@ app.whenReady().then(() => {
     if (!mainWindow) return;
     const current = mainWindow.isAlwaysOnTop();
     const newValue = !current;
+    isPinned = newValue;
     mainWindow.setAlwaysOnTop(newValue);
     store.set("alwaysOnTop", newValue);
     mainWindow.webContents.send("always-on-top-changed", newValue);
+    updateBrowserViewBounds();
   });
 
   app.on("activate", () => {
